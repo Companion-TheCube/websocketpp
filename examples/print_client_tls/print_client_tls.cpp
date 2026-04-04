@@ -28,6 +28,7 @@
 #include <websocketpp/config/asio_client.hpp>
 #include <websocketpp/client.hpp>
 
+#include <cstring>
 #include <iostream>
 
 typedef websocketpp::client<websocketpp::config::asio_tls_client> client;
@@ -64,7 +65,8 @@ bool verify_subject_alternative_name(const char * hostname, X509 * cert) {
         char const * dns_name = (char const *) ASN1_STRING_get0_data(current_name->d.dNSName);
         
         // Make sure there isn't an embedded NUL character in the DNS name
-        if (ASN1_STRING_length(current_name->d.dNSName) != strlen(dns_name)) {
+        if (static_cast<size_t>(ASN1_STRING_length(current_name->d.dNSName))
+            != std::strlen(dns_name)) {
             break;
         }
         // Compare expected hostname with the CN
@@ -98,7 +100,8 @@ bool verify_common_name(char const * hostname, X509 * cert) {
     char const * common_name_str = (char const *) ASN1_STRING_get0_data(common_name_asn1);
     
     // Make sure there isn't an embedded NUL character in the CN
-    if (ASN1_STRING_length(common_name_asn1) != strlen(common_name_str)) {
+    if (static_cast<size_t>(ASN1_STRING_length(common_name_asn1))
+        != std::strlen(common_name_str)) {
         return false;
     }
     

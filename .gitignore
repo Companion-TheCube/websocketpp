@@ -75,7 +75,7 @@ examples/wsperf/wsperf
 
 .sconsign.dblite
 
-build/
+build*/
 doxygen/
 examples/wsperf/wsperf_client
 

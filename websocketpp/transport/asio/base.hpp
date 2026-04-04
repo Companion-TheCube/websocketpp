@@ -34,6 +34,7 @@
 #include <websocketpp/common/system_error.hpp>
 #include <websocketpp/common/type_traits.hpp>
 
+#include <cstddef>
 #include <string>
 
 namespace websocketpp {
@@ -63,14 +64,14 @@ public:
     void * allocate(std::size_t memsize) {
         if (!m_in_use && memsize < size) {
             m_in_use = true;
-            return static_cast<void*>(&m_storage);
+            return static_cast<void*>(m_storage);
         } else {
             return ::operator new(memsize);
         }
     }
 
     void deallocate(void * pointer) {
-        if (pointer == &m_storage) {
+        if (pointer == static_cast<void*>(m_storage)) {
             m_in_use = false;
         } else {
             ::operator delete(pointer);
@@ -79,7 +80,7 @@ public:
 
 private:
     // Storage space used for handler-based custom memory allocation.
-    lib::aligned_storage<size>::type m_storage;
+    alignas(std::max_align_t) unsigned char m_storage[size];
 
     // Whether the handler-based custom allocation storage has been used.
     bool m_in_use;
